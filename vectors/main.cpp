@@ -5,40 +5,79 @@
 #include <chrono>
 
 #include "vec/vec4.hpp"
+#include "vec/vec3.hpp"
 #include "vectorclass/version2/vectorclass.h"
 #include "random10000.hpp"
+#include "utils.hpp"
 
-#define USE_STD_RAND
-
-#ifdef USE_STD_RAND
-auto random_double()  {
-    return 0.5 + rand() / (RAND_MAX + 1.0);
-}
-#else
-auto random_double()  {
-    random_index = (random_index + 1) % (sizeof(random_numbers) / sizeof (random_numbers[0]));
-    return random_numbers[random_index]; 
-}
-#endif
-
-template<typename F>
-void measure(char const *  const message, F && f) {
-    auto start = std::chrono::steady_clock::now();
-    f();
-    auto end = std::chrono::steady_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << message << ": " << ms << " ms" << std::endl;
-}
-
-std::ostream & operator << (std::ostream & out, vec::vec4 const & v) {
-    return out << "vec4{ " << v.x() << ", " << v.y() << ", " << v.z() << ", " << v.a() << "}";
-}
-
-std::ostream & operator << (std::ostream & out, Vec4d const & v) {
-    return out << "Vec4d{ " << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";
-}
+void benchmark_3d_vec();
+void benchmark_4d_vec();
 
 int main() {
+    benchmark_3d_vec();
+    benchmark_4d_vec();
+}
+
+__attribute__((noinline))
+auto DotVec4d(Vec4d const &a, Vec4d const & b) {
+    return horizontal_add(a * b);
+}
+
+__attribute__((noinline))
+void benchmark_3d_vec() {
+    constexpr auto size = 81000000;
+    using Vec3d = Vec4d; //ignore the 4th dimension and use cutoff
+
+    std::vector<vec::vec3> my_vecs;
+    std::vector<Vec3d> their_vecs;
+    measure("vectors populated", [&] {
+       my_vecs.reserve(size);
+       their_vecs.reserve(size);
+       for(auto i = 0; i < size; i++) {
+            auto x = random_double();
+            auto y = random_double();
+            auto z = random_double();
+            my_vecs.emplace_back(x, y, z);
+            their_vecs.emplace_back(x, y, z, 0);
+        }
+    });
+    vec::vec3 my_product(1, 1, 1);
+    Vec3d their_product(1, 1, 1, 0);
+    measure("my product", [&] {
+        for(auto e : my_vecs) {
+            my_product *= e; 
+        }
+    });
+    measure("their product", [&] {
+        for(auto e : their_vecs) {
+            their_product *= e;//.cutoff(3); 
+        }
+    }); 
+    std::cout << my_product << std::endl;
+    std::cout << their_product << std::endl;
+
+    double my_dot = 0;
+    double their_dot = 0;
+    measure("my dot", [&] {
+        for(auto e : my_vecs) {
+            my_dot += dot(e, e);
+        }
+    });
+    measure("their dot", [&] {
+        for(auto e : their_vecs) {
+            //their_dot += horizontal_add((e*e).cutoff(3));
+            //auto e3 = e.cutoff(3);
+            //their_dot += horizontal_add(e3 * e3);
+            //their_dot += horizontal_add(e*e);
+            their_dot += DotVec4d(e, e);
+        }
+    }); 
+    std::cout << my_dot << std::endl;
+    std::cout << their_dot << std::endl;
+}
+
+__attribute__((noinline))
+void benchmark_4d_vec() {
     constexpr auto size = 81000000;
     std::vector<vec::vec4> my_vecs;
     std::vector<Vec4d> their_vecs;

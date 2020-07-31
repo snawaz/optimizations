@@ -2,8 +2,8 @@
 
 # https://stackoverflow.com/questions/61103104/ld-unknown-option-platform-version-when-building-r-packages-from-source
 
-#FLAGS="-O3 -ffast-math -opt-always-inline -optl-loop-unroll -optlo-memdep -optlo-loop-unroll -optlo-scalarizer -optlo-globalopt -optlo-loop-unswitch -optlo-mem2reg -optlo-prune-eh -optlo-O3 -optl-ffast-math -pthread -opt-loop-vectorize -opt-force-vector-width=64"
-FLAGS="-ffast-math"
+FLAGS="-O3 -ffast-math -opt-always-inline -optl-loop-unroll -optlo-memdep -optlo-loop-unroll -optlo-scalarizer -optlo-globalopt -optlo-loop-unswitch -optlo-mem2reg -optlo-prune-eh -optlo-O3 -optl-ffast-math -pthread -opt-loop-vectorize -opt-force-vector-width=64"
+#FLAGS="-ffast-math"
 
 #export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
 #export CPPFLAGS="-I/Users/snawaz/llvm10/ -"
@@ -26,6 +26,8 @@ rm -f image.ppm
 # clang++ -v -S -mavx -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mfpmath=sse -march=native -O3 $FLAGS -std=c++20 -I /Users/snawaz/llvm10/include/c++/v1 -I src $LDFLAGS -mlinker-version=451.3 src/main.cpp -o cpp-ray
 
 clang++ -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mfpmath=sse -march=native -O3 $FLAGS -std=c++20 -I /Users/snawaz/llvm10/include/c++/v1 -I src $LDFLAGS -mlinker-version=500.3 main.cpp -o main
+
+clang++ -S -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mfpmath=sse -march=native -O3 $FLAGS -std=c++20 -I /Users/snawaz/llvm10/include/c++/v1 -I src -mlinker-version=500.3 main.cpp -o main.s
 
 #clang++ -v -std=c++17 -I /Users/snawaz/llvm10/include/c++/v1 -I /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include main.cpp -o cpp-ray
 #clang++ -v -std=c++17 -I /Users/snawaz/llvm10/include/c++/v1 -isystem /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include -isystem /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/System/Library/Frameworks -I /Users/snawaz/llvm10/include/c++/v1 main.cpp -o cpp-ray

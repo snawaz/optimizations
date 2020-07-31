@@ -91,8 +91,9 @@ namespace vec {
             return (1/t) * v;
         }
 
-    __attribute__((always_inline))
-        inline double dot(const vec4 &u, const vec4 &v) {
+    //__attribute__((always_inline))
+    __attribute__((noinline))
+        double dot(const vec4 &u, const vec4 &v) {
             return u.e[0] * v.e[0]
                 + u.e[1] * v.e[1]
                 + u.e[2] * v.e[2]
