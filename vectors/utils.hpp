@@ -1,14 +1,15 @@
 
 #pragma once
 
-
-std::ostream & operator << (std::ostream & out, vec::vec4 const & v) {
-    return out << "vec4{ " << v.x() << ", " << v.y() << ", " << v.z() << ", " << v.a() << "}";
-}
-
+#ifdef VEC3
 std::ostream & operator << (std::ostream & out, vec::vec3 const & v) {
     return out << "vec4{ " << v.x() << ", " << v.y() << ", " << v.z() << "}";
 }
+#else
+std::ostream & operator << (std::ostream & out, vec::vec4 const & v) {
+    return out << "vec4{ " << v.x() << ", " << v.y() << ", " << v.z() << ", " << v.a() << "}";
+}
+#endif
 
 std::ostream & operator << (std::ostream & out, Vec4d const & v) {
     return out << "Vec4d{ " << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";

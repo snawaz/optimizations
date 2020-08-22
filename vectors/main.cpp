@@ -4,8 +4,13 @@
 #include <cstdlib>
 #include <chrono>
 
-#include "vec/vec4.hpp"
-#include "vec/vec3.hpp"
+// #define VEC3
+
+#ifdef VEC3
+    #include "vec/vec3.hpp"
+#else
+    #include "vec/vec4.hpp"
+#endif
 #include "externals/version2/vectorclass.h"
 #include "random10000.hpp"
 #include "utils.hpp"
@@ -14,8 +19,11 @@ void benchmark_3d_vec();
 void benchmark_4d_vec();
 
 int main() {
+#ifdef VEC3
     benchmark_3d_vec();
+#else
     benchmark_4d_vec();
+#endif
 }
 
 __attribute__((noinline))
@@ -23,6 +31,7 @@ auto DotVec4d(Vec4d const &a, Vec4d const & b) {
     return horizontal_add(a * b);
 }
 
+#ifdef VEC3
 __attribute__((noinline))
 void benchmark_3d_vec() {
     constexpr auto size = 81000000;
@@ -75,7 +84,7 @@ void benchmark_3d_vec() {
     std::cout << my_dot << std::endl;
     std::cout << their_dot << std::endl;
 }
-
+#else
 __attribute__((noinline))
 void benchmark_4d_vec() {
     constexpr auto size = 81000000;
@@ -123,3 +132,4 @@ void benchmark_4d_vec() {
     std::cout << my_dot << std::endl;
     std::cout << their_dot << std::endl;
 }
+#endif
