@@ -6,7 +6,7 @@
 
 #include "vec/vec4.hpp"
 #include "vec/vec3.hpp"
-#include "vectorclass/version2/vectorclass.h"
+#include "externals/version2/vectorclass.h"
 #include "random10000.hpp"
 #include "utils.hpp"
 
