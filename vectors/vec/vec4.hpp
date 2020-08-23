@@ -8,7 +8,7 @@
 namespace vec {
     using std::sqrt;
 
-    class vec4 {
+    class alignas(16) vec4 {
         public:
             vec4(double e0, double e1, double e2, double e3) : e{e0, e1, e2, e3} {}
 
@@ -27,11 +27,20 @@ namespace vec {
                 return *this;
             }
 
-            __attribute__((always_inline)) vec4& operator*=(const vec4 &v) {
+            //__attribute__((always_inline))
+            __attribute__((noinline))
+            vec4& operator*=(const vec4 &v) {
+                #if 0
                 e[0] *= v.e[0];
                 e[1] *= v.e[1];
                 e[2] *= v.e[2];
                 e[3] *= v.e[3];
+                #else
+                auto ymm1 = _mm256_loadu_pd(e);
+                auto ymm2 = _mm256_loadu_pd(v.e);
+                auto ymm = _mm256_mul_pd(ymm1, ymm2);
+                _mm256_storeu_pd(e, ymm);
+                #endif
                 return *this;
             }
 
@@ -39,7 +48,7 @@ namespace vec {
                 e[0] *= t;
                 e[1] *= t;
                 e[2] *= t;
-                e[3] *= t; 
+                e[3] *= t;
                 return *this;
             }
 
@@ -71,7 +80,8 @@ namespace vec {
             return vec4(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2], u.e[3] - v.e[3]);
         }
 
-    __attribute__((always_inline))
+    //__attribute__((always_inline))
+    __attribute__((noinline))
         inline vec4 operator*(const vec4 &u, const vec4 &v) {
             return vec4(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2], u.e[3] * v.e[3]);
         }

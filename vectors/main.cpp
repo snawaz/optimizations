@@ -6,12 +6,12 @@
 
 // #define VEC3
 
+#include "externals/version2/vectorclass.h"
 #ifdef VEC3
     #include "vec/vec3.hpp"
 #else
     #include "vec/vec4.hpp"
 #endif
-#include "externals/version2/vectorclass.h"
 #include "random10000.hpp"
 #include "utils.hpp"
 
@@ -54,14 +54,14 @@ void benchmark_3d_vec() {
     Vec3d their_product(1, 1, 1, 0);
     measure("my product", [&] {
         for(auto e : my_vecs) {
-            my_product *= e; 
+            my_product *= e;
         }
     });
     measure("their product", [&] {
         for(auto e : their_vecs) {
-            their_product *= e;//.cutoff(3); 
+            their_product *= e;//.cutoff(3);
         }
-    }); 
+    });
     std::cout << my_product << std::endl;
     std::cout << their_product << std::endl;
 
@@ -80,11 +80,16 @@ void benchmark_3d_vec() {
             //their_dot += horizontal_add(e*e);
             their_dot += DotVec4d(e, e);
         }
-    }); 
+    });
     std::cout << my_dot << std::endl;
     std::cout << their_dot << std::endl;
 }
 #else
+__attribute__((noinline))
+void mult_assign(Vec4d & a, Vec4d const & b) {
+    a *= b;
+}
+
 __attribute__((noinline))
 void benchmark_4d_vec() {
     constexpr auto size = 81000000;
@@ -106,14 +111,14 @@ void benchmark_4d_vec() {
     Vec4d their_product(1, 1, 1, 1);
     measure("my product", [&] {
         for(auto const & e : my_vecs) {
-            my_product *= e; 
+            my_product *= e;
         }
     });
     measure("their product", [&] {
         for(auto const & e : their_vecs) {
-            their_product *= e; 
+            mult_assign(their_product, e);
         }
-    }); 
+    });
     std::cout << my_product << std::endl;
     std::cout << their_product << std::endl;
 
@@ -128,7 +133,7 @@ void benchmark_4d_vec() {
         for(auto const & e : their_vecs) {
             their_dot += horizontal_add(e*e);
         }
-    }); 
+    });
     std::cout << my_dot << std::endl;
     std::cout << their_dot << std::endl;
 }
